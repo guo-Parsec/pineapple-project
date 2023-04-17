@@ -15,8 +15,7 @@ import org.springframework.context.annotation.ComponentScan;
  * @date 2023/4/17
  */
 @ComponentScan({
-        "org.pineapple.common.base",
-        "org.pineapple.common.access",
+        "org.pineapple",
         "org.pineapple.system",
 })
 @EnableDiscoveryClient
