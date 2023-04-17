@@ -19,6 +19,7 @@ public class BizFaultRegistry implements FaultRegistry<BizFault> {
     private BizFaultRegistry() {
         faultStack = new ConcurrentHashMap<>();
         this.push(BizFault.class, new BizFault());
+        this.push(UnsupportedOperationFault.class, new UnsupportedOperationFault());
     }
 
     public static BizFaultRegistry getInstance() {

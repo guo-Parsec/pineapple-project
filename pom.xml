@@ -18,6 +18,7 @@
 
     <modules>
         <module>pineapple-common</module>
+        <module>pineapple-system</module>
     </modules>
 
     <properties>
@@ -36,6 +37,7 @@
         <mysql-connection.version>8.0.32</mysql-connection.version>
         <mybatis.version>2.3.0</mybatis.version>
         <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
+        <feign-form.version>3.8.0</feign-form.version>
     </properties>
 
     <dependencyManagement>
