@@ -1,7 +1,9 @@
-package org.pineapple.common.base;
+package org.pineapple.common.access;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.pineapple.common.base.CloneableModel;
+import org.pineapple.common.base.PrimaryKeyModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,18 +36,6 @@ public abstract class PersistableModel implements PrimaryKeyModel<Long>, Cloneab
     public PersistableModel(Long id) {
         super();
         this.id = id;
-    }
-
-    public PersistableModel(String id) {
-        super();
-        try {
-            this.id = Long.valueOf(id);
-        } catch (NumberFormatException e) {
-            this.id = null;
-            String name = this.getClass().getName();
-            log.warn("when class [{}] is instantiated, the conversion fails " +
-                    "when converting the string type to the primary key attribute [id] of type Long", name);
-        }
     }
 
     @Override

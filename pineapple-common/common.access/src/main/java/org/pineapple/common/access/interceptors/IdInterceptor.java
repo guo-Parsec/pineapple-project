@@ -1,16 +1,20 @@
 package org.pineapple.common.access.interceptors;
 
-import org.apache.ibatis.executor.statement.StatementHandler;
+import cn.hutool.core.util.ReflectUtil;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.binding.MapperMethod;
+import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.plugin.*;
-import org.apache.ibatis.reflection.MetaObject;
-import org.apache.ibatis.reflection.SystemMetaObject;
+import org.pineapple.common.access.InjectIdParam;
+import org.pineapple.common.access.PersistableModel;
 import org.pineapple.common.base.utils.Snowflake;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import java.sql.Connection;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.Collection;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -21,13 +25,11 @@ import java.util.Properties;
  * @project pineapple-project
  * @date 2023/4/17
  */
-@Intercepts({@Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class})})
-@Component
+@Intercepts({@Signature(type = Executor.class, method = "update", args = {MappedStatement.class, Object.class})})
 public class IdInterceptor implements Interceptor {
-    private Snowflake snowflake;
+    private final Snowflake snowflake;
 
-    @Autowired
-    public void setSnowflake(Snowflake snowflake) {
+    public IdInterceptor(Snowflake snowflake) {
         this.snowflake = snowflake;
     }
 
@@ -41,22 +43,61 @@ public class IdInterceptor implements Interceptor {
      */
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
-        // 获取 statementHandler 对象
-        StatementHandler statementHandler = (StatementHandler) invocation.getTarget();
-        MetaObject metaStatementHandler = SystemMetaObject.forObject(statementHandler);
-        // 获取 mappedStatement 对象和 sqlCommandType （SQL 语句类型）
-        MappedStatement mappedStatement = (MappedStatement) metaStatementHandler.getValue("delegate.mappedStatement");
-        SqlCommandType sqlCommandType = mappedStatement.getSqlCommandType();
-        // 判断是否为插入操作
-        if (SqlCommandType.INSERT.equals(sqlCommandType)) {
-            // 获取方法参数并设置 ID
-            Object parameterObject = metaStatementHandler.getValue("delegate.boundSql.parameterObject");
-            MetaObject metaParameterObject = SystemMetaObject.forObject(parameterObject);
-            metaParameterObject.setValue("id", snowflake.nextId());
+        Object[] args = invocation.getArgs();
+        MappedStatement ms = (MappedStatement) args[0];
+        Object parameter = args[1];
+        boolean isParamModified = parameter instanceof MapperMethod.ParamMap;
+        if (ms.getSqlCommandType().equals(SqlCommandType.INSERT)) {
+            String id = ms.getId();
+            int lastIndex = id.lastIndexOf(".");
+            String mapperClassName = id.substring(0, lastIndex);
+            String methodName = id.substring(lastIndex + 1);
+            Method method = ReflectUtil.getMethodByName(Class.forName(mapperClassName), methodName);
+            MapperMethod.ParamMap<?> paramMap = null;
+            if (isParamModified) {
+                paramMap = (MapperMethod.ParamMap<?>) parameter;
+            }
+            Parameter[] parameters = method.getParameters();
+            int index = 1;
+            for (Parameter methodParam : parameters) {
+                Param param = methodParam.getAnnotation(Param.class);
+                String keyName = "param" + index;
+                Object paramVal = null;
+                if (param != null && isParamModified) {
+                    paramVal = paramMap.containsKey(param.value()) ? paramMap.get(param.value()) : paramMap.get(keyName);
+                }
+                if (paramMap == null || param == null) {
+                    paramVal = parameter;
+                }
+                InjectIdParam injectIdParam = methodParam.getAnnotation(InjectIdParam.class);
+                if (injectIdParam == null) {
+                    continue;
+                }
+                handlerIdInject(paramVal);
+            }
         }
-        // 继续执行原有逻辑
         return invocation.proceed();
     }
+
+    @SuppressWarnings("unchecked")
+    private void handlerIdInject(Object parameter) {
+        if (parameter instanceof PersistableModel) {
+            persistableModelIdGenerate(parameter);
+        } else if (parameter instanceof Collection) {
+            Collection<?> collection = (Collection<?>) parameter;
+            collection.forEach(this::persistableModelIdGenerate);
+        } else if (parameter instanceof Map) {
+            ((Map<String, Object>) parameter).put("id", snowflake.nextId());
+        }
+    }
+
+    private void persistableModelIdGenerate(Object object) {
+        if (object instanceof PersistableModel) {
+            PersistableModel model = (PersistableModel) object;
+            model.setId(snowflake.nextId());
+        }
+    }
+
 
     /**
      * 返回被代理对象的动态代理对象。
@@ -70,5 +111,6 @@ public class IdInterceptor implements Interceptor {
      * 设置插件属性。
      */
     @Override
-    public void setProperties(Properties properties) {}
+    public void setProperties(Properties properties) {
+    }
 }

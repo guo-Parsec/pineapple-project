@@ -29,4 +29,20 @@ public class BizCommonConfig {
         SnowflakeProperties snowflake = bizCommonProperties.getSnowflake();
         return Snowflake.getInstance(snowflake.getDatacenterId(), snowflake.getMachineId());
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

@@ -15,9 +15,10 @@ import org.springframework.context.annotation.ComponentScan;
  * @date 2023/4/17
  */
 @ComponentScan({
-        "org.pineapple",
+        "org.pineapple.common",
         "org.pineapple.system",
 })
+//@Import({BizCommonConfig.class, MybatisConfig.class})
 @EnableDiscoveryClient
 @SpringBootApplication
 @EnableFeignClients(basePackages = {"org.pineapple.**.api"})

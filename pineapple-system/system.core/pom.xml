@@ -19,6 +19,17 @@
         <dependency>
             <groupId>org.pineapple</groupId>
             <artifactId>common.access</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.pineapple</groupId>
+                    <artifactId>common.base</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- 公共数据访问包 -->
+        <dependency>
+            <groupId>org.pineapple</groupId>
+            <artifactId>common.base</artifactId>
         </dependency>
         <!-- 系统服务api包 -->
         <dependency>
