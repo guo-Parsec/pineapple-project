@@ -22,7 +22,14 @@ public enum FieldFillType implements CodeEnumeratedValues<SqlCommandType> {
         this.code = code;
     }
 
-
+    /**
+     * <p>根据code获取类型</p>
+     *
+     * @param sqlCommandType sqlCommandType
+     * @return org.pineapple.common.access.types.FieldFillType
+     * @author pinea
+     * @date 2023/4/18 22:59
+     */
     public static FieldFillType findByCode(SqlCommandType sqlCommandType) {
         for (FieldFillType fieldFillType : values()) {
             if (fieldFillType.getCode() == sqlCommandType) {

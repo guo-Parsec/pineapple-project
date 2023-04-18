@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
  */
 @Setter
 @Getter
-@AutoFill(fillBeanClass = ExtPersistableModelFillProvider.class)
+@AutoFill(providerBean = ExtPersistableModelFillProvider.class)
 public class ExtPersistableModel extends PersistableModel {
     private static final long serialVersionUID = 3344166227393604493L;
 

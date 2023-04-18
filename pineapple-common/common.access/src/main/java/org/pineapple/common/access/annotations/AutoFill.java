@@ -17,5 +17,13 @@ import java.lang.annotation.*;
 @Inherited
 @Documented
 public @interface AutoFill {
-    Class<? extends FieldFillProvider> fillBeanClass();
+
+    /**
+     * <p>使用自动填充的提供者bean的class</p>
+     *
+     * @return java.lang.Class
+     * @author pinea
+     * @date 2023/4/18 22:56
+     */
+    Class<? extends FieldFillProvider> providerBean();
 }

@@ -9,7 +9,13 @@ package org.pineapple.common.access.constant;
  * @date 2023/4/18
  */
 public class InterceptorNameConstant {
+    /**
+     * 字段自动填充拦截器
+     */
     public static final String FieldAutoFillInterceptor = "fieldAutoFillInterceptor";
 
+    /**
+     * 主键自动生成拦截器
+     */
     public static final String PrimaryKeyGeneratorInterceptor = "primaryKeyGeneratorInterceptor";
 }

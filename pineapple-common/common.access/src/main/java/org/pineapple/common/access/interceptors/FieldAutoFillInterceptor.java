@@ -113,7 +113,7 @@ public class FieldAutoFillInterceptor extends SimpleMybatisInterceptor implement
         }
         AutoFill autoFill = obj.getClass().getAnnotation(AutoFill.class);
         if (autoFill != null) {
-            Class<? extends FieldFillProvider> providerClass = autoFill.fillBeanClass();
+            Class<? extends FieldFillProvider> providerClass = autoFill.providerBean();
             FieldFillProvider provider = SpringUtil.getBean(providerClass);
             provider.doFill(obj, currentFieldFillType);
         }

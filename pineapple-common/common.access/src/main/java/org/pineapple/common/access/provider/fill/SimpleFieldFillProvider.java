@@ -54,16 +54,18 @@ public abstract class SimpleFieldFillProvider<M extends Model> implements FieldF
         if (object instanceof Model) {
             modelObject = (M) object;
         }
-        if (fieldFillType == FieldFillType.INSERT) {
-            this.doInsertFill(modelObject);
+        if (modelObject == null) {
             return;
         }
-        if (fieldFillType == FieldFillType.UPDATE) {
-            this.doUpdateFill(modelObject);
-            return;
-        }
-        if (fieldFillType == FieldFillType.DELETE) {
-            this.doDeleteFill(modelObject);
+        switch (fieldFillType) {
+            case INSERT:
+                this.doInsertFill(modelObject);
+                return;
+            case UPDATE:
+                this.doUpdateFill(modelObject);
+                return;
+            case DELETE:
+                this.doDeleteFill(modelObject);
         }
     }
 }
