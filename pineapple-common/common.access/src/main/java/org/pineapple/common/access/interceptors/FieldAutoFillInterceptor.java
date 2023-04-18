@@ -35,10 +35,8 @@ import java.util.Set;
  */
 @Component(InterceptorNameConstant.FieldAutoFillInterceptor)
 @Intercepts({@Signature(type = Executor.class, method = "update", args = {MappedStatement.class, Object.class})})
-public class FieldAutoFillInterceptor implements MybatisInterceptor, InitializingBean {
+public class FieldAutoFillInterceptor extends SimpleMybatisInterceptor implements InitializingBean {
     private static Set<SqlCommandType> allowSqlCommandTypeSet = null;
-
-    private static final String PARAM_PREFIX = "param";
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
@@ -127,10 +125,5 @@ public class FieldAutoFillInterceptor implements MybatisInterceptor, Initializin
         allowSqlCommandTypeSet.add(SqlCommandType.INSERT);
         allowSqlCommandTypeSet.add(SqlCommandType.UPDATE);
         allowSqlCommandTypeSet.add(SqlCommandType.DELETE);
-    }
-
-    @Override
-    public String name() {
-        return InterceptorNameConstant.FieldAutoFillInterceptor;
     }
 }

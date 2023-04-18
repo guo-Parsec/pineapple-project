@@ -9,5 +9,12 @@ package org.pineapple.common.base.lang;
  * @date 2023/4/18
  */
 public interface Nameable {
-    String name();
+    /**
+     * <p>获取当前接口的名称</p>
+     *
+     * @return java.lang.String
+     * @author pinea
+     * @date 2023/4/18 22:40
+     */
+    String getName();
 }

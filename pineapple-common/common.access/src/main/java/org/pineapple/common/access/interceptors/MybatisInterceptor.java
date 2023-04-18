@@ -27,8 +27,7 @@ public interface MybatisInterceptor extends Interceptor, Nameable {
     }
 
     @Override
-    default void setProperties(Properties properties) {
-    }
+    default void setProperties(Properties properties) {}
 
     /**
      * <p>是否不允许拦截</p>
@@ -45,6 +44,6 @@ public interface MybatisInterceptor extends Interceptor, Nameable {
             return false;
         }
         String[] interceptors = notAllowInterceptor.interceptors();
-        return ArrayUtil.contains(interceptors, this.name());
+        return ArrayUtil.contains(interceptors, this.getName());
     }
 }

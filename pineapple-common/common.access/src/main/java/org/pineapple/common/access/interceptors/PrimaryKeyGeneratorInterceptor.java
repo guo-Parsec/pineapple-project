@@ -32,8 +32,7 @@ import java.util.Collection;
  */
 @Component(InterceptorNameConstant.PrimaryKeyGeneratorInterceptor)
 @Intercepts({@Signature(type = Executor.class, method = "update", args = {MappedStatement.class, Object.class})})
-public class PrimaryKeyGeneratorInterceptor implements MybatisInterceptor {
-    private static final String PARAM_PREFIX = "param";
+public class PrimaryKeyGeneratorInterceptor extends SimpleMybatisInterceptor {
     private final Snowflake snowflake;
 
     public PrimaryKeyGeneratorInterceptor(Snowflake snowflake) {
@@ -128,10 +127,5 @@ public class PrimaryKeyGeneratorInterceptor implements MybatisInterceptor {
             ReflectUtil.setFieldValue(obj, field, snowflake.nextId());
             field.setAccessible(false);
         }
-    }
-
-    @Override
-    public String name() {
-        return InterceptorNameConstant.PrimaryKeyGeneratorInterceptor;
     }
 }
