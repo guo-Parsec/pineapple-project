@@ -6,20 +6,21 @@ import org.apache.ibatis.binding.MapperMethod;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
-import org.apache.ibatis.plugin.*;
+import org.apache.ibatis.plugin.Intercepts;
+import org.apache.ibatis.plugin.Invocation;
+import org.apache.ibatis.plugin.Signature;
 import org.pineapple.common.access.annotations.PrimaryKey;
+import org.pineapple.common.access.constant.InterceptorNameConstant;
+import org.pineapple.common.access.utils.MybatisInterceptorUtil;
 import org.pineapple.common.base.Model;
 import org.pineapple.common.base.PrimaryKeyModel;
 import org.pineapple.common.base.utils.Snowflake;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Collection;
-import java.util.Properties;
 
 /**
  * <p>主键生成拦截器</p>
@@ -29,12 +30,9 @@ import java.util.Properties;
  * @project pineapple-project
  * @date 2023/4/18
  */
-@Component
+@Component(InterceptorNameConstant.PrimaryKeyGeneratorInterceptor)
 @Intercepts({@Signature(type = Executor.class, method = "update", args = {MappedStatement.class, Object.class})})
-public class PrimaryKeyGeneratorInterceptor implements Interceptor {
-    private static final Logger log = LoggerFactory.getLogger(PrimaryKeyGeneratorInterceptor.class);
-    private static final String DOT = ".";
-
+public class PrimaryKeyGeneratorInterceptor implements MybatisInterceptor {
     private static final String PARAM_PREFIX = "param";
     private final Snowflake snowflake;
 
@@ -49,6 +47,9 @@ public class PrimaryKeyGeneratorInterceptor implements Interceptor {
         Object[] args = invocation.getArgs();
         // 获取 Executor#update() 第一个参数
         MappedStatement ms = (MappedStatement) args[0];
+        if (this.isNotAllowIntercept(ms)) {
+            return invocation.proceed();
+        }
         // 获取 Executor#update() 第二个参数
         Object parameter = args[1];
         if (ms.getSqlCommandType() != SqlCommandType.INSERT) {
@@ -70,7 +71,7 @@ public class PrimaryKeyGeneratorInterceptor implements Interceptor {
      */
     private Object executePrimaryKeyGenerate(final Executor executor, final MappedStatement ms, final Object parameter) throws Throwable {
         // 获取被代理的方法
-        Method executeMapperMethod = findExecuteMapperMethod(ms);
+        Method executeMapperMethod = MybatisInterceptorUtil.findExecuteMapperMethod(ms);
         // 获取被代理方法中的参数列表
         Parameter[] parameters = executeMapperMethod.getParameters();
         // 判断是否是MapperMethod.ParamMap类型，如果是则获取MapperMethod.ParamMap
@@ -129,28 +130,8 @@ public class PrimaryKeyGeneratorInterceptor implements Interceptor {
         }
     }
 
-    /**
-     * <p>根据{@link MappedStatement}获取被代理Mapper方法</p>
-     *
-     * @param ms MappedStatement
-     * @return java.lang.reflect.Method
-     * @author pinea
-     * @date 2023/4/18 18:58
-     */
-    private Method findExecuteMapperMethod(final MappedStatement ms) throws ClassNotFoundException {
-        String mappedStatementId = ms.getId();
-        int index = mappedStatementId.lastIndexOf(DOT);
-        String mapperClassName = mappedStatementId.substring(0, index);
-        String methodName = mappedStatementId.substring(index + 1);
-        Class<?> mapperClass = Class.forName(mapperClassName);
-        return ReflectUtil.getMethodByName(mapperClass, methodName);
-    }
-
     @Override
-    public Object plugin(Object target) {
-        return Plugin.wrap(target, this);
+    public String name() {
+        return InterceptorNameConstant.PrimaryKeyGeneratorInterceptor;
     }
-
-    @Override
-    public void setProperties(Properties properties) {}
 }
