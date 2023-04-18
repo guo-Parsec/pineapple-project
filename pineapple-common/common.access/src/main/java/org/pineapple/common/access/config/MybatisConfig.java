@@ -1,8 +1,6 @@
 package org.pineapple.common.access.config;
 
-import org.pineapple.common.access.interceptors.IdInterceptor;
 import org.pineapple.common.base.utils.Snowflake;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -21,8 +19,8 @@ public class MybatisConfig {
         this.snowflake = snowflake;
     }
 
-    @Bean
-    public IdInterceptor idInterceptor() {
-        return new IdInterceptor(snowflake);
-    }
+//    @Bean
+//    public IdInterceptor idInterceptor() {
+//        return new IdInterceptor(snowflake);
+//    }
 }

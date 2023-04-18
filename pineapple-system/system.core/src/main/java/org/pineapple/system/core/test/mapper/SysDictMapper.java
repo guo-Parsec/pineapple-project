@@ -2,7 +2,6 @@ package org.pineapple.system.core.test.mapper;
 
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
-import org.pineapple.common.access.InjectIdParam;
 import org.pineapple.system.core.test.SysDict;
 import org.springframework.stereotype.Repository;
 
@@ -22,5 +21,5 @@ public interface SysDictMapper {
             "created_time, updated_by, updated_time) values " +
             "(#{id},#{dictType},#{dictCode},#{dictText}," +
             "#{dictSort},#{createdBy},#{createdTime},#{updatedBy},#{updatedTime})")
-    void create(@InjectIdParam SysDict sysDict);
+    void create(SysDict sysDict);
 }
