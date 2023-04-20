@@ -3,7 +3,6 @@ package org.pineapple.system.core.test;
 import lombok.Getter;
 import lombok.Setter;
 import org.pineapple.common.access.ExtPersistableModel;
-import org.pineapple.common.access.annotations.AutoFillProvider;
 
 import java.util.StringJoiner;
 
@@ -17,7 +16,6 @@ import java.util.StringJoiner;
  */
 @Setter
 @Getter
-@AutoFillProvider(provider = SysDictProvider.class)
 public class SysDict extends ExtPersistableModel {
     private static final long serialVersionUID = -5496104259136192597L;
 
