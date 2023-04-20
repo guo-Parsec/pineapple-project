@@ -1,5 +1,8 @@
 package org.pineapple.system.core.test;
 
+import org.pineapple.common.access.provider.fill.ExtPersistableModelFillProvider;
+import org.pineapple.common.access.provider.fill.FieldFillProvider;
+import org.pineapple.common.access.provider.fill.FieldFillProviderRegistry;
 import org.pineapple.common.base.response.ActionHelper;
 import org.pineapple.common.base.response.ActionResponse;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +26,7 @@ public class SysDictController {
 
     @GetMapping(value = "/create")
     public ActionResponse<Void> create() {
+        FieldFillProvider provider = FieldFillProviderRegistry.getInstance().get(ExtPersistableModelFillProvider.class);
         dictService.create();
         return ActionHelper.success();
     }

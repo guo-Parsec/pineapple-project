@@ -2,7 +2,7 @@ package org.pineapple.common.access;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.pineapple.common.access.annotations.AutoFill;
+import org.pineapple.common.access.annotations.AutoFillProvider;
 import org.pineapple.common.access.provider.fill.ExtPersistableModelFillProvider;
 
 import java.time.LocalDateTime;
@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
  */
 @Setter
 @Getter
-@AutoFill(providerBean = ExtPersistableModelFillProvider.class)
+@AutoFillProvider(provider = ExtPersistableModelFillProvider.class, alwaysEffective = true)
 public class ExtPersistableModel extends PersistableModel {
     private static final long serialVersionUID = 3344166227393604493L;
 

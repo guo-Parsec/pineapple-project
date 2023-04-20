@@ -2,6 +2,8 @@ package org.pineapple.common.access.provider.fill;
 
 import org.pineapple.common.access.types.FieldFillType;
 import org.pineapple.common.base.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>对{@link  FieldFillProvider}简单实现</p>
@@ -12,6 +14,8 @@ import org.pineapple.common.base.Model;
  * @date 2023/4/18
  */
 public abstract class SimpleFieldFillProvider<M extends Model> implements FieldFillProvider {
+    private static final Logger log = LoggerFactory.getLogger(SimpleFieldFillProvider.class);
+
     /**
      * <p>执行新增时的字段填充</p>
      *

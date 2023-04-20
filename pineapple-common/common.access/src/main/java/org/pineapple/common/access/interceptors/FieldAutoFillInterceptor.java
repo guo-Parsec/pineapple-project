@@ -1,6 +1,7 @@
 package org.pineapple.common.access.interceptors;
 
 import cn.hutool.extra.spring.SpringUtil;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.binding.MapperMethod;
@@ -10,10 +11,8 @@ import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.plugin.Intercepts;
 import org.apache.ibatis.plugin.Invocation;
 import org.apache.ibatis.plugin.Signature;
-import org.pineapple.common.access.ExtPersistableModel;
-import org.pineapple.common.access.annotations.AutoFill;
+import org.pineapple.common.access.annotations.AutoFillProvider;
 import org.pineapple.common.access.constant.InterceptorNameConstant;
-import org.pineapple.common.access.provider.fill.ExtPersistableModelFillProvider;
 import org.pineapple.common.access.provider.fill.FieldFillProvider;
 import org.pineapple.common.access.types.FieldFillType;
 import org.pineapple.common.access.utils.MybatisInterceptorUtil;
@@ -23,6 +22,7 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -106,17 +106,22 @@ public class FieldAutoFillInterceptor extends SimpleMybatisInterceptor implement
      * @date 2023/4/18 21:34
      */
     private void doObjectFieldFill(Object obj, FieldFillType currentFieldFillType) {
-        if (obj instanceof ExtPersistableModel) {
-            ExtPersistableModelFillProvider provider = SpringUtil.getBean(ExtPersistableModelFillProvider.class);
-            provider.doFill(obj, currentFieldFillType);
-            return;
+        AutoFillProvider autoFillProvider = null;
+        List<FieldFillProvider> providers = Lists.newArrayList();
+        Class<?> modelClass = obj.getClass();
+        while (modelClass != null) {
+            autoFillProvider = modelClass.getAnnotation(AutoFillProvider.class);
+            if (autoFillProvider != null) {
+                FieldFillProvider provider = SpringUtil.getBean(autoFillProvider.provider());
+                if (provider != null) {
+                    providers.add(provider);
+                }
+            }
+            modelClass = modelClass.getSuperclass();
         }
-        AutoFill autoFill = obj.getClass().getAnnotation(AutoFill.class);
-        if (autoFill != null) {
-            Class<? extends FieldFillProvider> providerClass = autoFill.providerBean();
-            FieldFillProvider provider = SpringUtil.getBean(providerClass);
+        providers.forEach(provider -> {
             provider.doFill(obj, currentFieldFillType);
-        }
+        });
     }
 
     @Override

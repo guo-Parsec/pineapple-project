@@ -1,5 +1,7 @@
 package org.pineapple.common.base.fault;
 
+import lombok.Getter;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -12,12 +14,13 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date 2023/4/17
  */
 public class BizFaultRegistry implements FaultRegistry<BizFault> {
-    protected Map<Class<? extends BizFault>, BizFault> faultStack;
+    @Getter
+    protected Map<Class<? extends BizFault>, BizFault> registryTable;
 
     private volatile static BizFaultRegistry instance;
 
     private BizFaultRegistry() {
-        faultStack = new ConcurrentHashMap<>();
+        registryTable = new ConcurrentHashMap<>();
         this.push(BizFault.class, new BizFault());
         this.push(UnsupportedOperationFault.class, new UnsupportedOperationFault());
     }
@@ -46,10 +49,10 @@ public class BizFaultRegistry implements FaultRegistry<BizFault> {
      */
     @Override
     public void push(Class<? extends BizFault> faultClass, BizFault fault) {
-        if (faultStack.containsKey(faultClass)) {
+        if (registryTable.containsKey(faultClass)) {
             return;
         }
-        faultStack.put(faultClass, fault);
+        registryTable.put(faultClass, fault);
     }
 
     /**
@@ -62,7 +65,7 @@ public class BizFaultRegistry implements FaultRegistry<BizFault> {
      */
     @Override
     public BizFault get(Class<? extends BizFault> faultClass) {
-        return faultStack.get(faultClass);
+        return registryTable.get(faultClass);
     }
 
     /**
@@ -73,8 +76,8 @@ public class BizFaultRegistry implements FaultRegistry<BizFault> {
      * @date 2023/4/17 16:23:27
      */
     @Override
-    public void pop(Class<? extends BizFault> faultClass) {
-        faultStack.remove(faultClass);
+    public void remove(Class<? extends BizFault> faultClass) {
+        registryTable.remove(faultClass);
     }
 
     /**
@@ -87,7 +90,7 @@ public class BizFaultRegistry implements FaultRegistry<BizFault> {
      */
     @Override
     public boolean contains(Class<? extends BizFault> faultClass) {
-        return faultStack.containsKey(faultClass);
+        return registryTable.containsKey(faultClass);
     }
 
     /**
@@ -99,7 +102,7 @@ public class BizFaultRegistry implements FaultRegistry<BizFault> {
      */
     @Override
     public boolean isEmpty() {
-        return faultStack == null || faultStack.isEmpty();
+        return registryTable == null || registryTable.isEmpty();
     }
 
     /**
@@ -111,7 +114,7 @@ public class BizFaultRegistry implements FaultRegistry<BizFault> {
      */
     @Override
     public int size() {
-        return faultStack == null ? 0 : faultStack.size();
+        return registryTable == null ? 0 : registryTable.size();
     }
 
     /**
@@ -124,10 +127,10 @@ public class BizFaultRegistry implements FaultRegistry<BizFault> {
      */
     @Override
     public boolean reload(Class<? extends BizFault> faultClass) {
-        if (!faultStack.containsKey(faultClass)) {
+        if (!registryTable.containsKey(faultClass)) {
             return false;
         }
-        BizFault fault = faultStack.get(faultClass);
+        BizFault fault = registryTable.get(faultClass);
         if (fault == null) {
             return false;
         }
@@ -143,7 +146,7 @@ public class BizFaultRegistry implements FaultRegistry<BizFault> {
      */
     @Override
     public void reload() {
-        faultStack.forEach((faultClass, fault) -> {
+        registryTable.forEach((faultClass, fault) -> {
             if (faultClass == null || fault == null) {
                 return;
             }
@@ -159,7 +162,7 @@ public class BizFaultRegistry implements FaultRegistry<BizFault> {
      */
     @Override
     public void clearEmptyFault() {
-        faultStack.entrySet().removeIf(entry -> entry.getKey() == null || entry.getValue() == null);
+        registryTable.entrySet().removeIf(entry -> entry.getKey() == null || entry.getValue() == null);
     }
 
     /**
