@@ -1,5 +1,0 @@
-spring:
-  application:
-    name: pineapple-system
-  profiles:
-    active: dev

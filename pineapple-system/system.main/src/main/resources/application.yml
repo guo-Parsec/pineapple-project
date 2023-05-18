@@ -1,7 +1,0 @@
-server:
-  port: 16200
-  servlet:
-    context-path: /system
-spring:
-  profiles:
-    include: common,data,biz,log
