@@ -5,7 +5,7 @@ import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.plugin.Plugin;
 import org.pineapple.common.access.annotations.NotAllowInterceptor;
-import org.pineapple.common.access.utils.MybatisInterceptorUtil;
+import org.pineapple.common.access.utils.MybatisUtil;
 import org.pineapple.common.base.lang.Nameable;
 import org.springframework.core.annotation.AnnotationUtils;
 
@@ -38,8 +38,8 @@ public interface MybatisInterceptor extends Interceptor, Nameable {
      * @date 2023/4/18 21:50
      */
     default boolean isNotAllowIntercept(MappedStatement ms) throws Throwable {
-        Method executeMapperMethod = MybatisInterceptorUtil.findExecuteMapperMethod(ms);
-        NotAllowInterceptor notAllowInterceptor = AnnotationUtils.getAnnotation(executeMapperMethod, NotAllowInterceptor.class);
+        Method proxyMethod = MybatisUtil.getProxyMethod(ms);
+        NotAllowInterceptor notAllowInterceptor = AnnotationUtils.getAnnotation(proxyMethod, NotAllowInterceptor.class);
         if (notAllowInterceptor == null) {
             return false;
         }

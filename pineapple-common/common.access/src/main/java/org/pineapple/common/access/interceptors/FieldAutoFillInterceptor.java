@@ -14,7 +14,7 @@ import org.pineapple.common.access.annotations.AutoFillProvider;
 import org.pineapple.common.access.constant.InterceptorNameConstant;
 import org.pineapple.common.access.provider.fill.FieldFillProvider;
 import org.pineapple.common.access.types.FieldFillType;
-import org.pineapple.common.access.utils.MybatisInterceptorUtil;
+import org.pineapple.common.access.utils.MybatisUtil;
 import org.pineapple.common.base.provider.SpringProvider;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
@@ -72,9 +72,9 @@ public class FieldAutoFillInterceptor extends SimpleMybatisInterceptor implement
      */
     private Object executeFieldAutoFill(final Executor executor, final MappedStatement ms, final Object parameter, FieldFillType currentFieldFillType) throws Throwable {
         // 获取被代理的方法
-        Method executeMapperMethod = MybatisInterceptorUtil.findExecuteMapperMethod(ms);
+        Method proxyMethod = MybatisUtil.getProxyMethod(ms);
         // 获取被代理方法中的参数列表
-        Parameter[] parameters = executeMapperMethod.getParameters();
+        Parameter[] parameters = proxyMethod.getParameters();
         // 判断是否是MapperMethod.ParamMap类型，如果是则获取MapperMethod.ParamMap
         MapperMethod.ParamMap<?> paramMap = parameter instanceof MapperMethod.ParamMap ? (MapperMethod.ParamMap<?>) parameter : null;
         // 参数顺序从1开始

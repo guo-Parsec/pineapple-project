@@ -11,12 +11,15 @@ import org.apache.ibatis.plugin.Invocation;
 import org.apache.ibatis.plugin.Signature;
 import org.pineapple.common.access.annotations.PrimaryKey;
 import org.pineapple.common.access.constant.InterceptorNameConstant;
-import org.pineapple.common.access.utils.MybatisInterceptorUtil;
+import org.pineapple.common.access.interfaces.IdGenerator;
+import org.pineapple.common.access.utils.MybatisUtil;
 import org.pineapple.common.base.Model;
 import org.pineapple.common.base.PrimaryKeyModel;
+import org.pineapple.common.base.provider.SpringProvider;
 import org.pineapple.common.base.utils.Snowflake;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -70,9 +73,9 @@ public class PrimaryKeyGeneratorInterceptor extends SimpleMybatisInterceptor {
      */
     private Object executePrimaryKeyGenerate(final Executor executor, final MappedStatement ms, final Object parameter) throws Throwable {
         // 获取被代理的方法
-        Method executeMapperMethod = MybatisInterceptorUtil.findExecuteMapperMethod(ms);
+        Method proxyMethod = MybatisUtil.getProxyMethod(ms);
         // 获取被代理方法中的参数列表
-        Parameter[] parameters = executeMapperMethod.getParameters();
+        Parameter[] parameters = proxyMethod.getParameters();
         // 判断是否是MapperMethod.ParamMap类型，如果是则获取MapperMethod.ParamMap
         MapperMethod.ParamMap<?> paramMap = parameter instanceof MapperMethod.ParamMap ? (MapperMethod.ParamMap<?>) parameter : null;
         // 参数顺序从1开始
@@ -124,7 +127,13 @@ public class PrimaryKeyGeneratorInterceptor extends SimpleMybatisInterceptor {
     private void generateSnowflakeToPrimaryKeyInObject(Object obj) {
         Field[] fields = ReflectUtil.getFields(obj.getClass(), field -> field.isAnnotationPresent(PrimaryKey.class));
         for (Field field : fields) {
-            ReflectUtil.setFieldValue(obj, field, snowflake.nextId());
+            PrimaryKey pk = field.getAnnotation(PrimaryKey.class);
+            Class<? extends IdGenerator<? extends Serializable>> clazz = pk.generator();
+            if (clazz == null) {
+                return;
+            }
+            IdGenerator<? extends Serializable> idGenerator = SpringProvider.getBean(clazz);
+            ReflectUtil.setFieldValue(obj, field, idGenerator.nextId());
             field.setAccessible(false);
         }
     }

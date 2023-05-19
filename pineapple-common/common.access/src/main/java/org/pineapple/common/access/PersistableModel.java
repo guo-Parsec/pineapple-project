@@ -3,6 +3,7 @@ package org.pineapple.common.access;
 import lombok.Getter;
 import lombok.Setter;
 import org.pineapple.common.access.annotations.PrimaryKey;
+import org.pineapple.common.access.generator.SnowflakeGenerator;
 import org.pineapple.common.base.CloneableModel;
 import org.pineapple.common.base.PrimaryKeyModel;
 import org.slf4j.Logger;
@@ -28,7 +29,7 @@ public abstract class PersistableModel implements PrimaryKeyModel<Long>, Cloneab
     /**
      * 类型为K的主键
      */
-    @PrimaryKey
+    @PrimaryKey(generator = SnowflakeGenerator.class)
     protected Long id;
 
     public PersistableModel() {

@@ -6,18 +6,16 @@ import java.io.Serializable;
 import java.lang.annotation.*;
 
 /**
- * <p>主键字段标识注解</p>
+ * id生成器
  *
- * @author pinea
- * @version 1.0
- * @project pineapple-project
- * @date 2023/4/18
+ * @author gcq
+ * @date 2023/5/19 11:16
  */
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
-public @interface PrimaryKey {
+public @interface GeneratedStrategy {
     /**
      * 生成器
      *

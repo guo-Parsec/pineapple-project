@@ -46,6 +46,14 @@ public class SpringProvider implements ApplicationContextAware {
         return applicationContext;
     }
 
+    /**
+     * 根据beanName获取bean
+     *
+     * @param name beanName
+     * @return T
+     * @author gcq
+     * @date 2023/5/19 10:40
+     */
     @SuppressWarnings("all")
     public static <T> T getBean(String name) {
         Object bean = null;
@@ -57,6 +65,14 @@ public class SpringProvider implements ApplicationContextAware {
         return (T) bean;
     }
 
+    /**
+     * 根据bean类型获取bean
+     *
+     * @param beanClass bean类型
+     * @return T
+     * @author gcq
+     * @date 2023/5/19 10:40
+     */
     public static <T> T getBean(Class<T> beanClass) {
         T bean = null;
         try {
@@ -67,6 +83,15 @@ public class SpringProvider implements ApplicationContextAware {
         return bean;
     }
 
+    /**
+     * 根据beanName和bean类型获取bean
+     *
+     * @param name      beanName
+     * @param beanClass bean类型
+     * @return T
+     * @author gcq
+     * @date 2023/5/19 10:40
+     */
     public static <T> T getBean(String name, Class<T> beanClass) {
         T bean = null;
         try {
@@ -77,6 +102,13 @@ public class SpringProvider implements ApplicationContextAware {
         return bean;
     }
 
+    /**
+     * 获取环境对象
+     *
+     * @return Environment
+     * @author gcq
+     * @date 2023/5/19 10:42
+     */
     public static Environment getEnvironment() {
         if (applicationContext == null) {
             return null;
@@ -84,14 +116,36 @@ public class SpringProvider implements ApplicationContextAware {
         return applicationContext.getEnvironment();
     }
 
+    /**
+     * 获取配置信息
+     *
+     * @param key 配置key
+     * @return String
+     * @author gcq
+     * @date 2023/5/19 10:42
+     */
     public static String getProperty(String key) {
         return getEnvironment() == null ? null : getEnvironment().getProperty(key);
     }
 
+    /**
+     * 获取应用名称
+     *
+     * @return String
+     * @author gcq
+     * @date 2023/5/19 10:41
+     */
     public static String getApplicationName() {
         return getProperty("spring.application.name");
     }
 
+    /**
+     * 获取当前激活的配置文件
+     *
+     * @return String
+     * @author gcq
+     * @date 2023/5/19 10:42
+     */
     public static String[] getActiveProfiles() {
         if (null == applicationContext) {
             return null;
